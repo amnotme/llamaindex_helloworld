@@ -12,6 +12,8 @@ setuptools = "*"
 html2text = "*"
 llama-index = "*"
 openai = "*"
+pinecone-client = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
