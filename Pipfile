@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+llama-index = "*"
+python-dotenv = "*"
+html2text = "*"
+setuptools = "*"
+exceptiongroup = "*"
+pylint = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
