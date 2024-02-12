@@ -5,7 +5,9 @@ import llama_index as llama  # Import the llama_index library
 
 def main(url: str) -> None:
     # Read web page content and convert it into text
-    documents = llama.readers.SimpleWebPageReader(html_to_text=True).load_data(urls=[url])
+    documents = llama.readers.SimpleWebPageReader(html_to_text=True).load_data(
+        urls=[url]
+    )
 
     # Create an index from the documents
     index = llama.VectorStoreIndex.from_documents(documents=documents)
@@ -14,13 +16,13 @@ def main(url: str) -> None:
     query_engine = index.as_query_engine()
 
     # Execute a query on the index
-    response = query_engine.query('What is LlamaIndex')
+    response = query_engine.query("What is LlamaIndex")
 
     # Print the response
     print(response)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Load environment variables from .env file
     load_dotenv()
 
@@ -30,4 +32,4 @@ if __name__ == '__main__':
         raise ValueError("OPENAI_API_KEY environment variable is not set.")
 
     # Call the main function with the specified URL
-    main(url='https://www.llamaindex.ai/')
+    main(url="https://www.llamaindex.ai/")
