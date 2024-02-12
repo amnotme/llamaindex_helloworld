@@ -14,6 +14,9 @@ llama-index = "*"
 openai = "*"
 pinecone-client = "*"
 python-dotenv = "*"
+black = "*"
+unstructured = "*"
+llama-hub = "*"
 
 [dev-packages]
 
