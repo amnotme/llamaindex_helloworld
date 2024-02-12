@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 .idea
 Pipfile.lock
+02_documentation_helper_llamaindex/llamaindex_docs/
