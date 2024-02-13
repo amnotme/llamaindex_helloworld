@@ -23,6 +23,7 @@ llama-index-vector-stores-pinecone = "*"
 llama-index-readers-file = "*"
 llama-index-readers-pinecone = "*"
 llama-index-readers-web = "*"
+watchdog = "*"
 
 [dev-packages]
 
