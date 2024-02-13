@@ -4,12 +4,25 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-llama-index = "*"
-python-dotenv = "*"
-html2text = "*"
+bs4 = "*"
+beautifulsoup4 = "*"
+requests = "*"
+urllib3 = "*"
 setuptools = "*"
-exceptiongroup = "*"
-pylint = "*"
+html2text = "*"
+llama-index = "*"
+openai = "*"
+pinecone-client = "*"
+python-dotenv = "*"
+black = "*"
+unstructured = "*"
+llama-hub = "*"
+streamlit = "*"
+llama-index-core = "*"
+llama-index-vector-stores-pinecone = "*"
+llama-index-readers-file = "*"
+llama-index-readers-pinecone = "*"
+llama-index-readers-web = "*"
 
 [dev-packages]
 
