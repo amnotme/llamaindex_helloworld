@@ -1,16 +1,13 @@
 import os  # Import the os module for working with the operating system
 from dotenv import load_dotenv  # Import load_dotenv function from dotenv module
-import llama_index as llama  # Import the llama_index library
-
-
+from llama_index.core import VectorStoreIndex
+from llama_index.readers.web import SimpleWebPageReader
 def main(url: str) -> None:
     # Read web page content and convert it into text
-    documents = llama.readers.SimpleWebPageReader(html_to_text=True).load_data(
-        urls=[url]
-    )
+    documents = SimpleWebPageReader(html_to_text=True).load_data(urls=[url])
 
     # Create an index from the documents
-    index = llama.VectorStoreIndex.from_documents(documents=documents)
+    index = VectorStoreIndex.from_documents(documents=documents)
 
     # Create a query engine from the index
     query_engine = index.as_query_engine()

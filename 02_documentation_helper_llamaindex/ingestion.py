@@ -1,15 +1,16 @@
 from dotenv import load_dotenv
 import os
-from llama_index import SimpleDirectoryReader, Document
-from llama_index.node_parser import SimpleNodeParser
-from llama_index.llms import OpenAI
+from llama_index.core import SimpleDirectoryReader, Document
+from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index import ServiceContext, VectorStoreIndex, StorageContext
-from llama_index.vector_stores import PineconeVectorStore
-from llama_hub.file.unstructured import UnstructuredReader
+from llama_index.core import VectorStoreIndex, StorageContext
+from llama_index.vector_stores.pinecone import PineconeVectorStore
+from llama_index.readers.file.unstructured import UnstructuredReader
+from llama_index.core.indices.base import IndexType
+from llama_index.core.settings import Settings
 from typing import Dict, List
 import pinecone
-from llama_index.indices.base import IndexType
 
 
 def initialize():
@@ -53,28 +54,25 @@ def get_documents_from_directory(
         return []
 
 
-def get_service_context(llm: str, openai_model: str) -> ServiceContext:
+def update_llama_index_settings_with_service_context(
+    llm: str, openai_model: str
+) -> None:
     """
-    Create and return a ServiceContext object.
+    Update llama index settings with service context.
 
     Args:
         llm (str): Name of the LLM (language model) to use.
         openai_model (str): Name of the OpenAI model to use for embeddings.
-
-    Returns:
-        ServiceContext: ServiceContext object configured with specified models.
     """
     try:
         node_parser = SimpleNodeParser.from_defaults(chunk_size=500, chunk_overlap=20)
         llm = OpenAI(model=llm, temperature=0)
         embed_model = OpenAIEmbedding(model_name=openai_model, embed_batch_size=100)
-        service_context = ServiceContext.from_defaults(
-            llm=llm, embed_model=embed_model, node_parser=node_parser
-        )
-        return service_context
+        Settings.llm = llm
+        Settings.embed_model = embed_model
+        Settings.node_parser = node_parser
     except Exception as e:
-        print(f"Error occurred while getting service context: {str(e)}")
-        return None
+        print(f"Error occurred while updating llama index settings: {str(e)}")
 
 
 def ingest_documents(index_name: str, documents: List[Document]) -> IndexType:
@@ -99,7 +97,6 @@ def ingest_documents(index_name: str, documents: List[Document]) -> IndexType:
         index = VectorStoreIndex.from_documents(
             documents=documents,
             storage_context=storage_context,
-            service_context=service_context,
             show_progress=True,
         )
         return index
@@ -125,8 +122,10 @@ if __name__ == "__main__":
             directory=DIRECTORY_TO_READ, file_extractor_dict=FILE_EXTRACTOR_DICT
         )
 
-        # Create and configure service context
-        service_context = get_service_context(llm=LLM_MODEL, openai_model=OPENAPI_MODEL)
+        # Update llama index settings with service context
+        update_llama_index_settings_with_service_context(
+            llm=LLM_MODEL, openai_model=OPENAPI_MODEL
+        )
 
         # Ingest documents into vector store index
         index = ingest_documents(index_name=INDEX_NAME, documents=documents)
