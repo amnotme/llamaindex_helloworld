@@ -2,6 +2,8 @@ import os  # Import the os module for working with the operating system
 from dotenv import load_dotenv  # Import load_dotenv function from dotenv module
 from llama_index.core import VectorStoreIndex
 from llama_index.readers.web import SimpleWebPageReader
+
+
 def main(url: str) -> None:
     # Read web page content and convert it into text
     documents = SimpleWebPageReader(html_to_text=True).load_data(urls=[url])
