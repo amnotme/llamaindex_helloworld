@@ -9,7 +9,7 @@ def main(url: str) -> None:
     documents = SimpleWebPageReader(html_to_text=True).load_data(urls=[url])
 
     # Create an index from the documents
-    index = VectorStoreIndex.from_documents(documents=documents)
+    index = VectorStoreIndex.from_documents(documents=documents, )
 
     # Create a query engine from the index
     query_engine = index.as_query_engine()

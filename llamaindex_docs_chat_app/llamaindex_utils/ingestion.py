@@ -22,7 +22,7 @@ def initialize():
     """
     try:
         load_dotenv()
-        if not os.getenv("OPENAI_API_KEY") or not os.getenv("PINECONE_API_KEY"):
+        if not os.getenv("OPENAI_API_KEY") or not os.getenv("PINECONE_API_KEY") or not os.getenv('PINECONE_ENVIRONMENT'):
             raise Exception(
                 "Not all environment variables have been loaded or are missing."
             )
@@ -107,11 +107,11 @@ def ingest_documents(index_name: str, documents: List[Document]) -> IndexType:
 
 if __name__ == "__main__":
     # Define constants
-    DIRECTORY_TO_READ: str = "./llamaindex_docs"
+    DIRECTORY_TO_READ: str = "./llamaindex_docs_tmp"
     FILE_EXTRACTOR_DICT: Dict = {".html": UnstructuredReader()}
     LLM_MODEL: str = "gpt-3.5-turbo"
     OPENAPI_MODEL: str = "text-embedding-ada-002"
-    INDEX_NAME: str = "llamaindex-document-helper-v0-10-0"
+    INDEX_NAME: str = os.getenv('PINECONE_ENVIRONMENT')
 
     try:
         # Initialize environment variables

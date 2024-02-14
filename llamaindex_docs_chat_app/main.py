@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.core.callbacks import LlamaDebugHandler, CallbackManager
@@ -202,19 +202,45 @@ def store_messages_with_references(st):
                     st.write("Sorry, I wasn't able to get any info on that!")
 
 
-if __name__ == "__main__":
-    index = get_index()
+def get_open_api_key(st):
 
+    with st.form("user_input"):
+        OPENAI_API_KEY = st.text_input(
+            "Enter your OpenAI API Key:", placeholder="sk-XXXX", type="password"
+        )
+        submitted = st.form_submit_button("Ready to chat with LlamaIndex")
+
+    if submitted:
+        if not OPENAI_API_KEY:
+            st.info(
+                "Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here]("
+                "https://platform.openai.com/account/api-keys)."
+            )
+            st.stop()
+        else:
+            set_key(
+                dotenv_path="../.env",
+                key_to_set="OPENAI_API_KEY",
+                value_to_set=OPENAI_API_KEY,
+            )
+
+
+if __name__ == "__main__":
     set_page_config(st=st)
 
     set_sidebar(st=st)
 
-    initialize_chat_messages(st=st)
+    if not os.getenv('OPENAI_API_KEY'):
+        get_open_api_key(st=st)
+    else:
+        index = get_index()
 
-    retrieve_augmented_generation_response(st=st, index=index)
+        initialize_chat_messages(st=st)
 
-    prompt = get_user_prompt(st=st)
+        retrieve_augmented_generation_response(st=st, index=index)
 
-    display_messages_on_feed(st=st)
+        prompt = get_user_prompt(st=st)
 
-    store_messages_with_references(st=st)
+        display_messages_on_feed(st=st)
+
+        store_messages_with_references(st=st)

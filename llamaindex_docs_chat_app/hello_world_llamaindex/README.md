@@ -46,7 +46,7 @@ Follow these steps to run the LlamaIndex Project:
 2. **Run the Script**
    - Start the main script via the command line:
      ```bash
-     pipenv run python main.py
+     pipenv run python hello_main.py
      ```
    - The script will automatically read the specified web page, index the content, and perform a query with the text "What is LlamaIndex".
 
