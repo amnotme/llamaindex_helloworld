@@ -3,27 +3,29 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-url = "https://gpt-index.readthedocs.io/en/stable/"
 
-output_dir = "./llamaindex_docs/"
+if __name__ == "__main__":
+    url = "https://docs.llamaindex.ai/en/stable/"
 
-os.makedirs(output_dir, exist_ok=True)
+    output_dir = "./llamaindex_docs/"
 
-response = requests.get(url=url)
-soup = BeautifulSoup(response.text, "html.parser")
+    os.makedirs(output_dir, exist_ok=True)
 
-links = soup.find_all("a", href=True)
+    response = requests.get(url=url)
+    soup = BeautifulSoup(response.text, "html.parser")
 
-for link in links:
-    href = link["href"]
+    links = soup.find_all("a", href=True)
 
-    if href.endswith(".html"):
-        if not href.startswith("http"):
-            href = urllib.parse.urljoin(base=url, url=href)
+    for link in links:
+        href = link["href"]
 
-        print(f"downloading {href}")
-        file_response = requests.get(href)
+        if href.endswith(".html"):
+            if not href.startswith("http"):
+                href = urllib.parse.urljoin(base=url, url=href)
 
-        file_name = os.path.join(output_dir, os.path.basename(href))
-        with open(file_name, "w", encoding="utf-8") as file:
-            file.write(file_response.text)
+            print(f"downloading {href}")
+            file_response = requests.get(href)
+
+            file_name = os.path.join(output_dir, os.path.basename(href))
+            with open(file_name, "w", encoding="utf-8") as file:
+                file.write(file_response.text)
