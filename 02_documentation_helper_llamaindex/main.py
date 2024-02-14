@@ -5,7 +5,12 @@ from llama_index.core.callbacks import LlamaDebugHandler, CallbackManager
 from llama_index.core.settings import Settings
 from llama_index.core.chat_engine.types import ChatMode
 from llama_index.core.postprocessor import SentenceEmbeddingOptimizer
-from node_postprocessors.duplicate_postprocessing import DuplicateRemoverNodePostProcessor
+from node_postprocessors.duplicate_postprocessing import (
+    DuplicateRemoverNodePostProcessor,
+)
+from llamaindex_docs_constants.llamaindex_docs_file_references import (
+    CITATION_REFERENCES,
+)
 import streamlit as st
 import pinecone
 import os
@@ -172,9 +177,14 @@ def store_messages_with_references(st):
                     with st.expander("Sources"):
                         with st.spinner("Loading citations"):
                             for idx, node in enumerate(nodes):
+                                file_path = CITATION_REFERENCES.get(
+                                    node.metadata.get("file_name")
+                                )
+                                if not file_path:
+                                    file_path = f"https://docs.llamaindex.ai/en/stable/ - Look for {node.metadata.get('file_name')}"
                                 reference = (
-                                    f"📖 Reference: {idx + 1} - 📊 Compatibility score - % {round(node.score * 100, 2)} \n"
-                                    f"🔗 https://docs.llamaindex.ai/en/stable/{node.metadata.get('file_path')}"
+                                    f"📖 Reference: {idx + 1} - 📊 Score - % {round(node.score * 100, 2)} \n"
+                                    f"🔗  {file_path}"
                                 )
                                 references.append(reference)
                                 st.write(reference)

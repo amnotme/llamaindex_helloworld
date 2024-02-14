@@ -107,11 +107,11 @@ def ingest_documents(index_name: str, documents: List[Document]) -> IndexType:
 
 if __name__ == "__main__":
     # Define constants
-    DIRECTORY_TO_READ: str = "./llamaindex_docs_tmp"
+    DIRECTORY_TO_READ: str = "./llamaindex_docs"
     FILE_EXTRACTOR_DICT: Dict = {".html": UnstructuredReader()}
     LLM_MODEL: str = "gpt-3.5-turbo"
     OPENAPI_MODEL: str = "text-embedding-ada-002"
-    INDEX_NAME: str = "llamaindex-documentation-helper"
+    INDEX_NAME: str = "llamaindex-document-helper-v0-10-0"
 
     try:
         # Initialize environment variables
