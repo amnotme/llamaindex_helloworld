@@ -5,10 +5,10 @@ from llama_index.core.callbacks import LlamaDebugHandler, CallbackManager
 from llama_index.core.settings import Settings
 from llama_index.core.chat_engine.types import ChatMode
 from llama_index.core.postprocessor import SentenceEmbeddingOptimizer
-from node_postprocessors.duplicate_postprocessing import (
+from llamaindex_docs_chat_app.node_postprocessors.duplicate_postprocessing import (
     DuplicateRemoverNodePostProcessor,
 )
-from llamaindex_docs_constants.llamaindex_docs_file_references import (
+from llamaindex_docs_chat_app.llamaindex_docs_constants.llamaindex_docs_file_references import (
     CITATION_REFERENCES,
 )
 import streamlit as st
@@ -75,7 +75,7 @@ def get_index() -> VectorStoreIndex:
     """
     index_name = "llamaindex-documentation-helper"
 
-    pc = pinecone.Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = pinecone.Pinecone()
     pc_index = pc.Index(name=index_name, host=os.getenv("PINECONE_INDEX_HOST"))
     vector_store = PineconeVectorStore(pinecone_index=pc_index)
 
@@ -219,7 +219,7 @@ def get_open_api_key(st):
             st.stop()
         else:
             set_key(
-                dotenv_path="../.env",
+                dotenv_path=".env",
                 key_to_set="OPENAI_API_KEY",
                 value_to_set=OPENAI_API_KEY,
             )
