@@ -24,6 +24,7 @@ llama-index-readers-file = "*"
 llama-index-readers-pinecone = "*"
 llama-index-readers-web = "*"
 watchdog = "*"
+llama-index-postprocessor-cohere-rerank = "*"
 
 [dev-packages]
 
