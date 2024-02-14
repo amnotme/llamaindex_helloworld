@@ -75,7 +75,7 @@ def get_index() -> VectorStoreIndex:
     """
     index_name = "llamaindex-documentation-helper"
 
-    pc = pinecone.Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = pinecone.Pinecone()
     pc_index = pc.Index(name=index_name, host=os.getenv("PINECONE_INDEX_HOST"))
     vector_store = PineconeVectorStore(pinecone_index=pc_index)
 
