@@ -1,3 +1,7 @@
+import nltk
+
+nltk.download("stopwords")
+
 import openai
 from time import sleep
 from dotenv import load_dotenv
@@ -18,6 +22,7 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 import streamlit as st
 import pinecone
 import os
+
 
 load_dotenv()
 
