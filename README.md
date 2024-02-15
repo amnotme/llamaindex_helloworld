@@ -4,6 +4,10 @@ This is a chat application powered by LlamaIndex, a Python library for building 
 
 [llamadocschat_app.webm](https://github.com/amnotme/streamlit_llamadocs_chat/assets/19755860/b788ac89-191a-4214-bef6-6260b535948d)
 
+## Try it!
+
+Feel free to try the app here: [llamadocschat](https://llamadocschat.streamlit.app/)
+
 
 ## Prerequisites
 
