@@ -47,7 +47,7 @@ def set_page_config() -> None:
         layout="centered",
         initial_sidebar_state="auto",
     )
-    st.title("Chat with LlamaIndex docs, 💬🦙")
+    st.title("Chat with LlamaIndex docs v0.10.3, 💬🦙")
 
 
 def set_sidebar() -> None:
@@ -58,7 +58,26 @@ def set_sidebar() -> None:
         st: Streamlit object.
     """
     with st.sidebar:
-        st.header("👨‍💻 About Leo")
+        st.header("💻  About the Llamadocs Chat App")
+        st.write(
+            """
+            This is a chat interface powered by LlamaIndex, designed to provide responses to user queries regarding LlamaIndex. 
+            
+            Highlights:
+            
+            Interactive Interface: Engage with an AI for insights on LlamaIndex.
+            Advanced AI: Utilizes LlamaIndex and Retrieval-Augmented Generation (RAG) for accurate responses.
+            Easy Setup: Straightforward installation and user-friendly instructions.
+            Resourceful Sidebar: Quick access to developer info and professional links.
+            Innovations:
+            
+            Pinecone Integration: Enhances response accuracy with vector similarity search.
+            Optimized Chat Engine: Ensures relevance and uniqueness in responses.
+            """
+         )
+        st.divider()
+
+        st.header("👨‍💻  About The Author")
         st.write(
             """
             Leo is a senior software engineer based in South Houston, TX, with a background in computer science from WGU. Working in tech, Leo is dedicated to contributing to innovative projects while pursuing the goal of starting his own business in the tech industry. Passionate about programming and technology trends, Leo enjoys engaging with the tech community to share insights and discuss code.
