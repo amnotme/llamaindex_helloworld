@@ -1,6 +1,6 @@
 import nltk
 
-nltk.download("stopwords")
+nltk.download('stopwords')
 
 import openai
 from time import sleep
