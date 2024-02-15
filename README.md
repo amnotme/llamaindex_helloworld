@@ -2,10 +2,12 @@
 
 This is a chat application powered by LlamaIndex, a Python library for building applications using large language models (LLMs). The application allows users to ask questions about LlamaIndex and receive responses from the assistant.
 
+[llamadocschat_app.webm](https://github.com/amnotme/streamlit_llamadocs_chat/assets/19755860/b788ac89-191a-4214-bef6-6260b535948d)
+
+
 ## Prerequisites
 
-- Python installed
-- Basic understanding of Python programming
+- Python 3.9 or higher installed
 
 ## Installation
 
