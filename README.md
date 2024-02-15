@@ -8,6 +8,8 @@ This is a chat application powered by LlamaIndex, a Python library for building 
 ## Prerequisites
 
 - Python 3.9 or higher installed
+- OpenAI account and an OpenAI api key
+- Pinecone account and a Pinecount api key
 
 ## Installation
 
