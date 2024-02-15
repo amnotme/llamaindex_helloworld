@@ -1,4 +1,6 @@
-from dotenv import load_dotenv, set_key
+import openai
+from time import sleep
+from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.core.callbacks import LlamaDebugHandler, CallbackManager
@@ -11,6 +13,8 @@ from llamaindex_docs_chat_app.node_postprocessors.duplicate_postprocessing impor
 from llamaindex_docs_chat_app.llamaindex_docs_constants.llamaindex_docs_file_references import (
     CITATION_REFERENCES,
 )
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
 import streamlit as st
 import pinecone
 import os
@@ -18,7 +22,7 @@ import os
 load_dotenv()
 
 
-def set_page_config(st) -> None:
+def set_page_config() -> None:
     """
     Sets up the page configuration for the web app.
 
@@ -35,7 +39,7 @@ def set_page_config(st) -> None:
     st.title("Chat with LlamaIndex docs, 💬🦙")
 
 
-def set_sidebar(st) -> None:
+def set_sidebar() -> None:
     """
     Sets up the sidebar content.
 
@@ -56,7 +60,7 @@ def set_sidebar(st) -> None:
         st.subheader("🔗 Connect with Me", anchor=False)
         st.markdown(
             """
-            - [🐙 GitHub](https://github.com/amnotme)
+            - [🐙 Source Code](https://github.com/amnotme/streamlit_llamadocs_chat)
             - [👔 LinkedIn](https://www.linkedin.com/in/leopoldo-hernandez/)
             """
         )
@@ -65,8 +69,8 @@ def set_sidebar(st) -> None:
         st.write("Made with ♥, powered by LlamaIndex and OpenAI")
 
 
-@st.cache_resource(show_spinner=False)
-def get_index() -> VectorStoreIndex:
+@st.cache_resource(show_spinner=True)
+def get_index(api_key) -> VectorStoreIndex:
     """
     Retrieves the vector index.
 
@@ -75,17 +79,21 @@ def get_index() -> VectorStoreIndex:
     """
     index_name = "llamaindex-documentation-helper"
 
-    pc = pinecone.Pinecone()
-    pc_index = pc.Index(name=index_name, host=os.getenv("PINECONE_INDEX_HOST"))
+    pc_index = pinecone.Pinecone().Index(
+        name=index_name, host=os.getenv("PINECONE_INDEX_HOST")
+    )
     vector_store = PineconeVectorStore(pinecone_index=pc_index)
 
-    llama_debug = LlamaDebugHandler(print_trace_on_end=True)
-    callback_manager = CallbackManager(handlers=[llama_debug])
-    Settings.callback_manager = callback_manager
+    Settings.callback_manager = CallbackManager(
+        handlers=[LlamaDebugHandler(print_trace_on_end=True)]
+    )
+    Settings.embed_model = OpenAIEmbedding(api_key=api_key)
+    Settings.llm = OpenAI(api_key=api_key)
+
     return VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
 
-def retrieve_augmented_generation_response(st, index):
+def retrieve_augmented_generation_response(index):
     """
     Retrieves the response from the chat engine.
 
@@ -94,7 +102,7 @@ def retrieve_augmented_generation_response(st, index):
         index: VectorStoreIndex object.
     """
     postprocessor = SentenceEmbeddingOptimizer(
-        embed_model=Settings.embed_model, percentile_cutoff=0.5, threshold_cutoff=0.8
+        embed_model=Settings.embed_model, percentile_cutoff=0.5, threshold_cutoff=0.7
     )
     if not st.session_state.get("chat_engine"):
         duplicate_node_remover = DuplicateRemoverNodePostProcessor()
@@ -105,7 +113,7 @@ def retrieve_augmented_generation_response(st, index):
         )
 
 
-def initialize_chat_messages(st):
+def initialize_chat_messages():
     """
     Initializes chat messages.
 
@@ -121,7 +129,7 @@ def initialize_chat_messages(st):
         ]
 
 
-def get_user_prompt(st):
+def get_user_prompt():
     """
     Gets the user input prompt.
 
@@ -141,7 +149,7 @@ def get_user_prompt(st):
     return prompt
 
 
-def display_messages_on_feed(st):
+def display_messages_on_feed():
     """
     Displays messages on the feed.
 
@@ -159,18 +167,53 @@ def display_messages_on_feed(st):
                             st.divider()
 
 
-def store_messages_with_references(st):
+def reset_state():
+    """Initializes necessary states for the app."""
+    if "submitted" in st.session_state.keys():
+        del st.session_state["submitted"]
+    if "openai_key" in st.session_state.keys():
+        del st.session_state["openai_key"]
+    if "messages" in st.session_state.keys():
+        del st.session_state["messages"]
+    if "chat_engine" in st.session_state.keys():
+        del st.session_state["chat_engine"]
+    openai.api_key = None
+
+
+def update_api_key(api_key):
+    """Updates the api key in case it is incorrect"""
+    openai.api_key = api_key
+    Settings.llm = OpenAI(api_key=api_key)
+    Settings.embed_model = OpenAIEmbedding(api_key=api_key)
+
+
+def store_messages_with_references(prompt):
     """
     Stores messages with references.
 
     Args:
         st: Streamlit object.
     """
+    response = None  # Initialize response to None
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
             with st.spinner("Thinking"):
                 try:
                     response = st.session_state.chat_engine.stream_chat(message=prompt)
+                except Exception as e:
+                    if "401" in str(e):
+                        st.error(
+                            "Incorrect API key provided. Please check and update your API key. The app will now reload!."
+                        )
+                        reset_state()
+                        sleep(5)
+                        st.rerun()
+                    else:
+                        st.write("Sorry, I wasn't able to get any info on that!")
+                        st.error(f"An error occurred: {e}")
+                        return  # Exit the function early
+
+                if response:
                     st.write_stream(response.response_gen)
                     nodes = [node for node in response.source_nodes]
                     references = []
@@ -198,49 +241,59 @@ def store_messages_with_references(st):
                     if references:
                         stored_response["references"] = references
                     st.session_state.messages.append(stored_response)
-                except Exception as e:
-                    st.write("Sorry, I wasn't able to get any info on that!")
 
 
-def get_open_api_key(st):
+def initialize_state_manager():
+    """Initializes necessary states for the app."""
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False
+    if "openai_key" not in st.session_state:
+        st.session_state.openai_key = None
 
-    with st.form("user_input"):
-        OPENAI_API_KEY = st.text_input(
-            "Enter your OpenAI API Key:", placeholder="sk-XXXX", type="password"
-        )
-        submitted = st.form_submit_button("Ready to chat with LlamaIndex")
 
-    if submitted:
-        if not OPENAI_API_KEY:
-            st.info(
-                "Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here]("
-                "https://platform.openai.com/account/api-keys)."
+def get_open_api_key():
+    """Manages OpenAI API key input and submission logic."""
+    if not st.session_state.submitted:
+        with st.form("user_input", clear_on_submit=True):
+            openai_api_key = st.text_input(
+                "Enter your OpenAI API Key:", placeholder="sk-XXXX", type="password"
             )
-            st.stop()
-        else:
-            set_key(
-                dotenv_path=".env",
-                key_to_set="OPENAI_API_KEY",
-                value_to_set=OPENAI_API_KEY,
-            )
+            submitted = st.form_submit_button("Ready to chat with LlamaIndex")
+            if submitted:
+                if openai_api_key:
+                    update_api_key(api_key=openai_api_key)
+                    st.session_state.submitted = True
+                    st.session_state.openai_key = openai_api_key
+                    st.rerun()
+                else:
+                    st.warning("Please enter your OpenAI API key to proceed.")
+
+
+def main_chat_functionality():
+
+    if st.session_state.openai_key:  # Ensure API key is set
+        index = get_index(api_key=st.session_state.openai_key)
+
+        initialize_chat_messages()
+
+        retrieve_augmented_generation_response(index=index)
+
+        prompt = get_user_prompt()
+
+        display_messages_on_feed()
+
+        if prompt:
+            store_messages_with_references(prompt=prompt)
 
 
 if __name__ == "__main__":
-    set_page_config(st=st)
+    set_page_config()
 
-    set_sidebar(st=st)
+    set_sidebar()
 
-    if not os.getenv('OPENAI_API_KEY'):
-        get_open_api_key(st=st)
-    else:
-        index = get_index()
+    initialize_state_manager()
 
-        initialize_chat_messages(st=st)
+    get_open_api_key()
 
-        retrieve_augmented_generation_response(st=st, index=index)
-
-        prompt = get_user_prompt(st=st)
-
-        display_messages_on_feed(st=st)
-
-        store_messages_with_references(st=st)
+    if st.session_state.submitted:
+        main_chat_functionality()

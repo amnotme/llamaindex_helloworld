@@ -161,3 +161,4 @@ cython_debug/
 .idea
 Pipfile.lock
 llamaindex_docs_chat_app/llamaindex_docs/
+.streamlit/
